@@ -1,0 +1,270 @@
+﻿*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f3f4f6;
+    color:#333;
+}
+
+body,
+input,
+button,
+select{
+    font:inherit;
+}
+
+/* HEADER */
+
+.topo{
+    background:#a505c9;
+    color:#fff;
+    text-align:center;
+    padding:25px;
+}
+
+.topo h1{
+    margin-bottom:8px;
+}
+
+/* MENU */
+
+nav{
+    background:#8a04aa;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    padding:12px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    transition:.3s;
+}
+
+nav a:hover{
+    color:#ffd6ff;
+}
+
+/* CONTEÚDO */
+
+.conteudo{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.painel h2{
+    color:#a505c9;
+    margin-bottom:20px;
+}
+
+/* FORMULÁRIOS */
+
+.form-painel{
+    display:grid;
+    gap:12px;
+}
+
+.form-painel.busca{
+    grid-template-columns:1fr auto;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:12px;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#a505c9;
+}
+
+/* BOTÕES */
+
+button{
+    background:#c951db;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#a505c9;
+}
+
+/* LISTAS */
+
+.lista{
+    list-style:none;
+    margin-top:15px;
+    display:grid;
+    gap:10px;
+}
+
+.lista li{
+    background:#f8f8f8;
+    padding:12px;
+    border-radius:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.lista li button{
+    background:#ef4444;
+}
+
+.lista li button:hover{
+    background:#dc2626;
+}
+
+/* BUSCA DE LIVROS */
+
+.grid-livros{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card-livro{
+    background:white;
+    border-radius:15px;
+    border:1px solid #ddd;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.card-livro img{
+    width:100%;
+    height:300px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.card-livro h3{
+    font-size:1rem;
+}
+
+.card-livro p{
+    color:#666;
+}
+
+.card-livro button{
+    margin-top:auto;
+}
+
+/* LIVRO SELECIONADO */
+
+.detalhes-livro{
+    margin-top:20px;
+    background:#f8f8f8;
+    border-radius:15px;
+    padding:15px;
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+}
+
+.detalhes-livro img{
+    width:120px;
+    border-radius:10px;
+}
+
+/* EMPRÉSTIMOS */
+
+.card-emprestimo{
+  background:#f8f8f8;
+    border-radius:15px;
+    padding:15px;
+    display:flex;
+    align-items:flex-start;
+    gap:20px;
+    margin-top:15px;
+}
+
+
+.card-emprestimo img{
+   width:90px;
+    height:130px;
+    object-fit:cover;
+    border-radius:10px;
+    flex-shrink:0;
+}
+
+.card-emprestimo div{
+    flex:1;
+}
+
+.card-emprestimo h3{
+    margin:0 0 10px;
+    color:#a505c9;
+}
+
+.card-emprestimo p{
+    margin:5px 0;
+}
+
+.card-emprestimo button{
+    width:fit-content;
+    background:#ef4444;
+}
+
+.card-emprestimo button:hover{
+    background:#dc2626;
+}
+
+/* STATUS */
+
+.status{
+    margin-bottom:15px;
+    font-weight:bold;
+    color:#a505c9;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+    nav{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .form-painel.busca{
+        grid-template-columns:1fr;
+    }
+
+    .detalhes-livro{
+        flex-direction:column;
+        align-items:center;
+        text-align:center;
+    }
+
+    .card-emprestimo{
+        grid-template-columns:1fr;
+    }
+}

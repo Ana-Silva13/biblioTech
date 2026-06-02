@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiblioTech</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="topo">
+        <nav>
+            <a href="index.html">Clientes</a>
+            <a href="BuscaLivros.html">Livros</a>
+            <a href="ControleEmprestimo.html">Empréstimos</a>
+        </nav>
+        <div>
+            <h1>BiblioTech</h1>
+            <p>Sistema de cadastro, busca de livros e controle de empréstimos no navegador.</p>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <section class="painel painel-clientes card">
+            <h2>Cadastro de Clientes</h2>
+            <form id="formCliente" class="form-painel">
+                <input id="nome" type="text" placeholder="Nome completo" autocomplete="name">
+                <input id="cpf" type="text" placeholder="CPF" autocomplete="off">
+                <input id="email" type="email" placeholder="E-mail" autocomplete="email">
+                <button type="submit">Cadastrar Cliente</button>
+            </form>
+            <div class="subtitulo">Clientes cadastrados</div>
+            <ul id="listaClientes" class="lista"></ul>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

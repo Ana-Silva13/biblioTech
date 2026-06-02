@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <nav>
+        <a href="index.html">Clientes</a>
+        <a href="BuscaLivros.html">Livros</a>
+        <a href="ControleEmprestimo.html">Empréstimos</a>
+    </nav>
+    <meta charset="UTF-8">
+    <title>Biblioteca</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="conteudo">
+        <section class="painel painel-busca card">
+            <section class="painel painel-busca card">
+                <h2>Busca de Livros</h2>
+                <div class="form-painel busca">
+                    <input id="termoBusca" type="text" placeholder="Digite o nome do livro">
+                    <button id="btnBuscarLivro" type="button">Buscar</button>
+                </div>
+                <div id="buscaStatus" class="status"></div>
+                <div id="resultados" class="grid-livros"></div>
+                <div id="detalhesLivro" class="detalhes-livro"></div>
+            </section>
+        </section>
+
+        <script src="script.js"></script>
+
+</body>
+
+</html>
