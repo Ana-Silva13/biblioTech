@@ -8,7 +8,6 @@ const inputNome = document.getElementById('nome');
 const inputCpf = document.getElementById('cpf');
 const inputEmail = document.getElementById('email');
 const inputSenha = document.getElementById('senha');
-const selectPerfil = document.getElementById('perfil');
 const listaClientes = document.getElementById('listaClientes');
 
 const formLogin = document.getElementById('formLogin');
@@ -48,6 +47,20 @@ function salvarUsuarioLogado(usuario) {
 
 function obterUsuarioLogado() {
     return JSON.parse(sessionStorage.getItem(STORAGE_CRACHA) || 'null');
+}
+
+function garantirAdmin() {
+    const existeAdmin = clientes.some((cliente) => cliente.email.toLowerCase() === 'admin' && cliente.senha === 'admin' && cliente.perfil === 'ADMIN');
+    if (!existeAdmin) {
+        clientes.push({
+            nome: 'Administrador',
+            cpf: '00000000000',
+            email: 'admin',
+            senha: 'admin',
+            perfil: 'ADMIN'
+        });
+        salvarClientes();
+    }
 }
 
 function sair() {
@@ -118,7 +131,8 @@ function renderizarClientes() {
         listaClientes.innerHTML = '';
     }
 
-    if (clientes.length === 0) {
+    const leitores = clientes.filter((cliente) => cliente.perfil === 'LEITOR');
+    if (leitores.length === 0) {
         if (listaClientes) {
             const li = document.createElement('li');
             li.textContent = 'Nenhum cliente cadastrado ainda.';
@@ -127,11 +141,11 @@ function renderizarClientes() {
         return;
     }
 
-    clientes.forEach((cliente, index) => {
+    leitores.forEach((cliente, index) => {
         if (listaClientes) {
             const li = document.createElement('li');
             const info = document.createElement('span');
-            info.textContent = `${cliente.nome} | CPF: ${cliente.cpf} | E-mail: ${cliente.email} | Perfil: ${cliente.perfil}`;
+            info.textContent = `${cliente.nome} | CPF: ${cliente.cpf} | E-mail: ${cliente.email}`;
 
             const botaoExcluir = document.createElement('button');
             botaoExcluir.type = 'button';
@@ -149,13 +163,13 @@ function renderizarClientes() {
 function adicionarCliente(event) {
     event.preventDefault();
 
-    if (!inputNome || !inputCpf || !inputEmail || !inputSenha || !selectPerfil) return;
+    if (!inputNome || !inputCpf || !inputEmail || !inputSenha) return;
 
     const nome = inputNome.value.trim();
     const cpf = inputCpf.value.trim();
     const email = inputEmail.value.trim();
     const senha = inputSenha.value.trim();
-    const perfil = selectPerfil.value;
+    const perfil = 'LEITOR';
 
     if (!nome || !cpf || !email || !senha) {
         alert('Preencha todos os campos do usuário.');
@@ -193,11 +207,14 @@ function logarUsuario(event) {
     const senha = inputPassword.value.trim();
 
     if (!email || !senha) {
-        alert('Preencha e-mail e senha.');
+        alert('Preencha login/e-mail e senha.');
         return;
     }
 
-    const usuario = clientes.find((cliente) => cliente.email.toLowerCase() === email && cliente.senha === senha);
+    let usuario = clientes.find((cliente) => cliente.email.toLowerCase() === email && cliente.senha === senha);
+    if (!usuario && email === 'admin' && senha === 'admin') {
+        usuario = { nome: 'Administrador', email: 'admin', perfil: 'ADMIN' };
+    }
     if (!usuario) {
         alert('E-mail ou senha inválidos.');
         return;
@@ -535,6 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarAcessoPagina();
     mostrarUsuarioLogado();
 
+    garantirAdmin();
     renderizarClientes();
 
     if (formCliente) {

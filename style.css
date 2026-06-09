@@ -162,6 +162,15 @@ button:hover{
     background:#a505c9;
 }
 
+.warning-text{
+    color:#b91c1c;
+    background:#fee2e2;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #fecaca;
+    margin-bottom:14px;
+}
+
 /* LISTAS */
 
 .lista{
