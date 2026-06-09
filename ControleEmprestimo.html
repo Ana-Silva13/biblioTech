@@ -10,23 +10,19 @@
 
 <body>
     <header class="topo">
-        <nav>
-            <a href="index.html">Clientes</a>
-            <a href="BuscaLivros.html">Livros</a>
-            <a href="ControleEmprestimo.html">Empréstimos</a>
-        </nav>
+        <div>
+            <h1>Controle de Empréstimo</h1>
+        </div>
+        <div class="badge">
+            <span id="usuarioLogado"></span>
+            <button id="btnLogout" type="button" class="logout-btn">Sair</button>
+        </div>
     </header>
 
     <main class="conteudo">
-        <div id="detalhesLivro" class="detalhes-livro"></div>
-
         <section class="painel painel-emprestimos card">
-            <h2>Controle de Empréstimos</h2>
-            <div id="statusEmprestimo" class="status"></div>
-            <div class="form-painel emprestimo">
-                <select id="selectCliente"></select>
-                <button id="btnFinalizar" type="button">Finalizar Empréstimo</button>
-            </div>
+            <h2>Gerenciar Empréstimos</h2>
+            <p>Somente o administrador vê esta página. Aqui estão os empréstimos registrados.</p>
             <div class="subtitulo">Empréstimos ativos</div>
             <ul id="listaEmprestimos" class="lista"></ul>
         </section>

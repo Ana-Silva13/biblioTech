@@ -1,26 +1,34 @@
 ﻿const STORAGE_CLIENTES = 'biblioTech_clientes';
 const STORAGE_EMPRESTIMOS = 'biblioTech_emprestimos';
 const STORAGE_LIVRO = 'biblioTech_livroSelecionado';
+const STORAGE_CRACHA = 'biblioTech_cracha';
 
 const formCliente = document.getElementById('formCliente');
 const inputNome = document.getElementById('nome');
 const inputCpf = document.getElementById('cpf');
 const inputEmail = document.getElementById('email');
+const inputSenha = document.getElementById('senha');
+const selectPerfil = document.getElementById('perfil');
 const listaClientes = document.getElementById('listaClientes');
-const selectCliente = document.getElementById('selectCliente');
+
+const formLogin = document.getElementById('formLogin');
+const inputUsername = document.getElementById('username');
+const inputPassword = document.getElementById('password');
+const usuarioLogadoBadge = document.getElementById('usuarioLogado');
+const btnLogout = document.getElementById('btnLogout');
 
 const btnBuscarLivro = document.getElementById('btnBuscarLivro');
 const inputBuscaLivro = document.getElementById('termoBusca');
 const statusBusca = document.getElementById('buscaStatus');
 const resultados = document.getElementById('resultados');
 const detalhesLivro = document.getElementById('detalhesLivro');
-
-const btnFinalizar = document.getElementById('btnFinalizar');
+const historicoEmprestimos = document.getElementById('historicoEmprestimos');
 const listaEmprestimos = document.getElementById('listaEmprestimos');
 
 let clientes = JSON.parse(localStorage.getItem(STORAGE_CLIENTES) || '[]');
 let emprestimos = JSON.parse(localStorage.getItem(STORAGE_EMPRESTIMOS) || '[]');
 let livroSelecionado = JSON.parse(localStorage.getItem(STORAGE_LIVRO) || 'null');
+let ultimosLivros = [];
 
 function salvarClientes() {
     localStorage.setItem(STORAGE_CLIENTES, JSON.stringify(clientes));
@@ -32,6 +40,60 @@ function salvarEmprestimos() {
 
 function salvarLivroSelecionado() {
     localStorage.setItem(STORAGE_LIVRO, JSON.stringify(livroSelecionado));
+}
+
+function salvarUsuarioLogado(usuario) {
+    sessionStorage.setItem(STORAGE_CRACHA, JSON.stringify(usuario));
+}
+
+function obterUsuarioLogado() {
+    return JSON.parse(sessionStorage.getItem(STORAGE_CRACHA) || 'null');
+}
+
+function sair() {
+    sessionStorage.removeItem(STORAGE_CRACHA);
+    window.location.href = 'Login.html';
+}
+
+function mostrarUsuarioLogado() {
+    const usuario = obterUsuarioLogado();
+    if (!usuario || !usuarioLogadoBadge) return;
+    usuarioLogadoBadge.textContent = `Crachá: ${usuario.nome} (${usuario.perfil})`;
+}
+
+function verificarAcessoPagina() {
+    const usuario = obterUsuarioLogado();
+    const pagina = location.pathname.split('/').pop();
+
+    if (pagina === 'Login.html') {
+        if (usuario) {
+            if (usuario.perfil === 'ADMIN') {
+                window.location.href = 'ControleEmprestimo.html';
+            } else {
+                window.location.href = 'BuscaLivros.html';
+            }
+        }
+        return;
+    }
+
+    if (pagina === 'index.html') {
+        return;
+    }
+
+    if (!usuario) {
+        window.location.href = 'Login.html';
+        return;
+    }
+
+    if (pagina === 'BuscaLivros.html' && usuario.perfil !== 'LEITOR') {
+        window.location.href = 'ControleEmprestimo.html';
+        return;
+    }
+
+    if (pagina === 'ControleEmprestimo.html' && usuario.perfil !== 'ADMIN') {
+        window.location.href = 'BuscaLivros.html';
+        return;
+    }
 }
 
 function formatarData(dataString) {
@@ -55,9 +117,6 @@ function renderizarClientes() {
     if (listaClientes) {
         listaClientes.innerHTML = '';
     }
-    if (selectCliente) {
-        selectCliente.innerHTML = '<option value="">Selecione um cliente</option>';
-    }
 
     if (clientes.length === 0) {
         if (listaClientes) {
@@ -72,7 +131,7 @@ function renderizarClientes() {
         if (listaClientes) {
             const li = document.createElement('li');
             const info = document.createElement('span');
-            info.textContent = `${cliente.nome} | CPF: ${cliente.cpf} | E-mail: ${cliente.email}`;
+            info.textContent = `${cliente.nome} | CPF: ${cliente.cpf} | E-mail: ${cliente.email} | Perfil: ${cliente.perfil}`;
 
             const botaoExcluir = document.createElement('button');
             botaoExcluir.type = 'button';
@@ -84,43 +143,72 @@ function renderizarClientes() {
             listaClientes.appendChild(li);
         }
 
-        if (selectCliente) {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = cliente.nome;
-            selectCliente.appendChild(option);
-        }
     });
 }
 
 function adicionarCliente(event) {
     event.preventDefault();
 
-    if (!inputNome || !inputCpf || !inputEmail) return;
+    if (!inputNome || !inputCpf || !inputEmail || !inputSenha || !selectPerfil) return;
 
     const nome = inputNome.value.trim();
     const cpf = inputCpf.value.trim();
     const email = inputEmail.value.trim();
+    const senha = inputSenha.value.trim();
+    const perfil = selectPerfil.value;
 
-    if (!nome || !cpf || !email) {
-        alert('Preencha todos os campos do cliente.');
+    if (!nome || !cpf || !email || !senha) {
+        alert('Preencha todos os campos do usuário.');
         return;
     }
 
-    clientes.push({ nome, cpf, email });
+    const existente = clientes.some((cliente) => cliente.email.toLowerCase() === email.toLowerCase());
+    if (existente) {
+        alert('Já existe um usuário com esse e-mail.');
+        return;
+    }
+
+    clientes.push({ nome, cpf, email, senha, perfil });
     salvarClientes();
     renderizarClientes();
     formCliente.reset();
-    alert('Cliente cadastrado com sucesso.');
+    alert('Usuário cadastrado com sucesso.');
 }
 
 function removerCliente(index) {
     const cliente = clientes[index];
-    if (!cliente || !confirm(`Remover o cliente ${cliente.nome}?`)) return;
+    if (!cliente || !confirm(`Remover o usuário ${cliente.nome}?`)) return;
 
     clientes.splice(index, 1);
     salvarClientes();
     renderizarClientes();
+}
+
+function logarUsuario(event) {
+    event.preventDefault();
+
+    if (!inputUsername || !inputPassword) return;
+
+    const email = inputUsername.value.trim().toLowerCase();
+    const senha = inputPassword.value.trim();
+
+    if (!email || !senha) {
+        alert('Preencha e-mail e senha.');
+        return;
+    }
+
+    const usuario = clientes.find((cliente) => cliente.email.toLowerCase() === email && cliente.senha === senha);
+    if (!usuario) {
+        alert('E-mail ou senha inválidos.');
+        return;
+    }
+
+    salvarUsuarioLogado({ nome: usuario.nome, email: usuario.email, perfil: usuario.perfil });
+    if (usuario.perfil === 'ADMIN') {
+        window.location.href = 'ControleEmprestimo.html';
+    } else {
+        window.location.href = 'BuscaLivros.html';
+    }
 }
 
 async function buscarLivros() {
@@ -149,6 +237,7 @@ async function buscarLivros() {
         }
 
         atualizarStatus(`Encontrados ${livros.length} livros. Selecione um para empréstimo.`);
+        ultimosLivros = livros;
         renderizarResultados(livros);
     } catch (erro) {
         console.error(erro);
@@ -161,7 +250,7 @@ function renderizarResultados(livros) {
     if (!resultados) return;
     resultados.innerHTML = '';
 
-    livros.forEach((livro) => {
+    livros.forEach((livro, index) => {
         const capa = criarCapa(livro.cover_i);
         const autor = livro.author_name ? livro.author_name.join(', ') : 'Autor desconhecido';
 
@@ -178,29 +267,93 @@ function renderizarResultados(livros) {
         const autorEl = document.createElement('p');
         autorEl.textContent = autor;
 
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
         const botao = document.createElement('button');
         botao.type = 'button';
+        botao.className = 'select-book';
+        botao.dataset.index = index;
         botao.textContent = 'Selecionar para Empréstimo';
-        botao.addEventListener('click', () => selecionarLivro({
-            titulo: livro.title || 'Título desconhecido',
-            autor,
-            capa
-        }));
+
+        const botaoConfirmar = document.createElement('button');
+        botaoConfirmar.type = 'button';
+        botaoConfirmar.className = 'confirm-book';
+        botaoConfirmar.dataset.index = index;
+        botaoConfirmar.textContent = 'Confirmar Empréstimo';
+        botaoConfirmar.style.display = 'none';
+
+        actions.appendChild(botao);
+        actions.appendChild(botaoConfirmar);
 
         card.appendChild(imagem);
         card.appendChild(titulo);
         card.appendChild(autorEl);
-        card.appendChild(botao);
+        card.appendChild(actions);
         resultados.appendChild(card);
     });
 }
 
-function selecionarLivro(livro) {
+function handleResultadoClick(event) {
+    const botaoSelecionar = event.target.closest('button.select-book');
+    const botaoConfirmar = event.target.closest('button.confirm-book');
+    if (botaoSelecionar) {
+        const card = botaoSelecionar.closest('.card-livro');
+        const index = Number(botaoSelecionar.dataset.index);
+        if (Number.isNaN(index) || !ultimosLivros[index]) return;
+
+        const livro = ultimosLivros[index];
+        selecionarLivro({
+            titulo: livro.title || 'Título desconhecido',
+            autor: livro.author_name ? livro.author_name.join(', ') : 'Autor desconhecido',
+            capa: criarCapa(livro.cover_i)
+        }, card);
+        return;
+    }
+
+    if (botaoConfirmar) {
+        const card = botaoConfirmar.closest('.card-livro');
+        if (card && card.classList.contains('selecionado')) {
+            confirmarEmprestimo();
+        } else {
+            alert('Selecione um livro antes de confirmar.');
+        }
+    }
+}
+
+function selecionarLivro(livro, card = null) {
     livroSelecionado = livro;
     salvarLivroSelecionado();
 
-    alert('Livro selecionado com sucesso.');
-    window.location.href = 'ControleEmprestimo.html';
+    if (resultados) {
+        resultados.querySelectorAll('.card-livro').forEach((item) => {
+            item.classList.remove('selecionado');
+            const existente = item.querySelector('.selected-label');
+            if (existente) {
+                existente.remove();
+            }
+            const confirm = item.querySelector('.confirm-book');
+            if (confirm) {
+                confirm.style.display = 'none';
+            }
+        });
+
+        if (card) {
+            card.classList.add('selecionado');
+            const label = document.createElement('span');
+            label.className = 'selected-label';
+            label.textContent = 'Livro escolhido';
+            card.appendChild(label);
+
+            const confirm = card.querySelector('.confirm-book');
+            if (confirm) {
+                confirm.style.display = 'inline-block';
+            }
+        }
+    }
+
+    exibirLivroSelecionado();
+    renderizarHistorico();
 }
 
 function exibirLivroSelecionado() {
@@ -226,30 +379,80 @@ function exibirLivroSelecionado() {
 
     conteudo.appendChild(titulo);
     conteudo.appendChild(autor);
+
+    const usuario = obterUsuarioLogado();
+    if (usuario && usuario.perfil === 'LEITOR') {
+        const botaoEmprestar = document.createElement('button');
+        botaoEmprestar.type = 'button';
+        botaoEmprestar.textContent = 'Confirmar Empréstimo';
+        botaoEmprestar.addEventListener('click', confirmarEmprestimo);
+        conteudo.appendChild(botaoEmprestar);
+    }
+
     detalhesLivro.appendChild(imagem);
     detalhesLivro.appendChild(conteudo);
 }
 
-function finalizarEmprestimo() {
-    if (!selectCliente) {
-        alert('Erro ao localizar a lista de clientes.');
+function renderizarHistorico() {
+    const usuario = obterUsuarioLogado();
+    if (!historicoEmprestimos) return;
+
+    historicoEmprestimos.innerHTML = '';
+    if (!usuario) {
+        const li = document.createElement('li');
+        li.textContent = 'Faça login para ver seu histórico de empréstimos.';
+        historicoEmprestimos.appendChild(li);
         return;
     }
 
-    const clienteIndex = selectCliente.value;
-    if (clienteIndex === '') {
-        alert('Selecione um cliente.');
+    const historico = emprestimos.filter((emprestimo) => emprestimo.clienteEmail === usuario.email);
+    if (historico.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'Você ainda não pegou nenhum livro emprestado.';
+        historicoEmprestimos.appendChild(li);
+        return;
+    }
+
+    historico.forEach((emprestimo) => {
+        const card = document.createElement('div');
+        card.className = 'card-emprestimo';
+
+        const imagem = document.createElement('img');
+        imagem.src = emprestimo.livroCapa;
+        imagem.alt = emprestimo.livroTitulo;
+
+        const conteudo = document.createElement('div');
+        
+        const titulo = document.createElement('h3');
+        titulo.textContent = emprestimo.livroTitulo;
+
+        const autor = document.createElement('p');
+        autor.textContent = `Autor: ${emprestimo.livroAutor}`;
+
+        const devolucao = document.createElement('p');
+        devolucao.textContent = `Devolução: ${formatarData(emprestimo.devolucao)}`;
+
+        conteudo.appendChild(titulo);
+        conteudo.appendChild(autor);
+        conteudo.appendChild(devolucao);
+
+        card.appendChild(imagem);
+        card.appendChild(conteudo);
+
+        historicoEmprestimos.appendChild(card);
+    });
+}
+
+function confirmarEmprestimo() {
+    const usuario = obterUsuarioLogado();
+    if (!usuario) {
+        alert('Faça login para confirmar o empréstimo.');
+        window.location.href = 'Login.html';
         return;
     }
 
     if (!livroSelecionado) {
-        alert('Nenhum livro foi selecionado.');
-        return;
-    }
-
-    const cliente = clientes[Number(clienteIndex)];
-    if (!cliente) {
-        alert('Cliente inválido.');
+        alert('Nenhum livro selecionado.');
         return;
     }
 
@@ -257,9 +460,9 @@ function finalizarEmprestimo() {
     dataDevolucao.setDate(dataDevolucao.getDate() + 7);
 
     emprestimos.unshift({
-        clienteNome: cliente.nome,
-        clienteCpf: cliente.cpf,
-        clienteEmail: cliente.email,
+        clienteNome: usuario.nome,
+        clienteCpf: usuario.cpf || '',
+        clienteEmail: usuario.email,
         livroTitulo: livroSelecionado.titulo,
         livroAutor: livroSelecionado.autor,
         livroCapa: livroSelecionado.capa,
@@ -269,8 +472,8 @@ function finalizarEmprestimo() {
     salvarEmprestimos();
     livroSelecionado = null;
     salvarLivroSelecionado();
-    renderizarEmprestimos();
-    alert(`Empréstimo realizado!\nDevolução: ${formatarData(dataDevolucao.toISOString())}`);
+    exibirLivroSelecionado();
+    alert(`Empréstimo realizado! Devolução: ${formatarData(dataDevolucao.toISOString())}`);
 }
 
 function renderizarEmprestimos() {
@@ -329,6 +532,8 @@ function renderizarEmprestimos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    verificarAcessoPagina();
+    mostrarUsuarioLogado();
 
     renderizarClientes();
 
@@ -336,16 +541,25 @@ document.addEventListener('DOMContentLoaded', () => {
         formCliente.addEventListener('submit', adicionarCliente);
     }
 
-    if (btnBuscarLivro) {
-        btnBuscarLivro.addEventListener('click', buscarLivros);
-        exibirLivroSelecionado();
+    if (formLogin) {
+        formLogin.addEventListener('submit', logarUsuario);
     }
 
-    if (btnFinalizar) {
-        renderizarEmprestimos();
+    if (btnLogout) {
+        btnLogout.addEventListener('click', sair);
+    }
+
+    if (btnBuscarLivro) {
+        btnBuscarLivro.addEventListener('click', buscarLivros);
+        if (resultados) {
+            resultados.addEventListener('click', handleResultadoClick);
+        }
         exibirLivroSelecionado();
-        btnFinalizar.addEventListener('click', finalizarEmprestimo);
+        renderizarHistorico();
+    }
+
+    if (location.pathname.split('/').pop() === 'ControleEmprestimo.html') {
+        renderizarEmprestimos();
     }
 
 });
-

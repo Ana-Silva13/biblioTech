@@ -2,33 +2,40 @@
 <html lang="pt-BR">
 
 <head>
-    <nav>
-        <a href="index.html">Clientes</a>
-        <a href="BuscaLivros.html">Livros</a>
-        <a href="ControleEmprestimo.html">Empréstimos</a>
-    </nav>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <header class="topo">
+        <div>
+            <h1>Busca de Livros</h1>
+        </div>
+        <div class="badge">
+            <span id="usuarioLogado"></span>
+            <button id="btnLogout" type="button" class="logout-btn">Sair</button>
+        </div>
+    </header>
 
     <main class="conteudo">
         <section class="painel painel-busca card">
-            <section class="painel painel-busca card">
-                <h2>Busca de Livros</h2>
-                <div class="form-painel busca">
-                    <input id="termoBusca" type="text" placeholder="Digite o nome do livro">
-                    <button id="btnBuscarLivro" type="button">Buscar</button>
-                </div>
-                <div id="buscaStatus" class="status"></div>
-                <div id="resultados" class="grid-livros"></div>
-                <div id="detalhesLivro" class="detalhes-livro"></div>
-            </section>
+            <h2>Busca de Livros</h2>
+            <p>Busque e confirme o empréstimo do livro selecionado.</p>
+            <div class="form-painel busca">
+                <input id="termoBusca" type="text" placeholder="Digite o nome do livro">
+                <button id="btnBuscarLivro" type="button">Buscar</button>
+            </div>
+            <div id="buscaStatus" class="status"></div>
+            <div id="resultados" class="grid-livros"></div>
+            <div id="detalhesLivro" class="detalhes-livro"></div>
+            <div class="subtitulo">Histórico de livros já pegos</div>
+            <ul id="historicoEmprestimos" class="lista"></ul>
         </section>
+    </main>
 
-        <script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 
